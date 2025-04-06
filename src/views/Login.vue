@@ -11,19 +11,35 @@
   </template>
   
   <script>
+  import api from "../services/Api";
+  import toast from "../services/Toast";
+  
   export default {
     data() {
       return {
         email: '',
         password: '',
-      }
+      };
     },
     methods: {
       async handleLogin() {
-        // aqui tenho q incluir chamada para o backend
-        console.log('Tentando logar com', this.email, this.password)
+        try {
+          const response = await api.post('login', {
+            email: this.email,
+            password: this.password,
+          });
+  
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+  
+          toast.success('Login realizado com sucesso!');
+          this.$router.push('/dashboard');
+        } catch (error) {
+          console.error('Erro ao logar:', error.response?.data || error.message);
+          toast.error('Erro ao fazer login.');
+        }
       },
     },
-  }
+  };
   </script>
   
