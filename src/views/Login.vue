@@ -1,5 +1,6 @@
 <template>
-  <div class="login-wrapper">
+  <div class="login-container">
+    <div class="login-image"></div>
     <div class="login-box">
       <h2>Entrar</h2>
       <form @submit.prevent="handleLogin">
@@ -16,6 +17,8 @@
 </template>
 
 <script>
+import api from "../services/Api";
+
 export default {
   data() {
     return {
@@ -25,29 +28,50 @@ export default {
   },
   methods: {
     async handleLogin() {
-      console.log('Tentando logar com', this.email, this.password);
-      // chamada para backend
+      try {
+        const response = await api.post('/login', {
+          email: this.email,
+          password: this.password,
+        });
+
+        const { token, user } = response.data;
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        this.$router.push('/dashboard');
+      } catch (error) {
+        alert('Erro ao logar. Verifique suas credenciais.');
+        console.error(error);
+      }
     },
   },
 };
 </script>
 
 <style scoped>
-.login-wrapper {
+.login-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
   height: 100vh;
-  background: #f4f6f8;
+  overflow: hidden;
 }
 
+.login-image {
+  flex: 1;
+  background-image: url('/fundo-login.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+
 .login-box {
+  flex: 1;
   background: #fff;
-  padding: 40px 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 100px;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
   text-align: center;
 }
 
@@ -101,5 +125,21 @@ export default {
 
 .register-text a:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .login-image {
+    display: none;
+  }
+
+  .login-box {
+    flex: none;
+    width: 100%;
+    height: 100vh;
+  }
 }
 </style>
