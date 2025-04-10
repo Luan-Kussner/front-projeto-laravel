@@ -1,6 +1,5 @@
 <template>
   <div class="login-container">
-    <div class="login-image"></div>
     <div class="login-box">
       <h2>Entrar</h2>
       <form @submit.prevent="handleLogin">
@@ -54,15 +53,8 @@ export default {
   display: flex;
   height: 100vh;
   overflow: hidden;
+  background: #f4f6f8;
 }
-
-.login-image {
-  flex: 1;
-  background-image: url('/fundo-login.jpg');
-  background-size: cover;
-  background-position: center;
-}
-
 
 .login-box {
   flex: 1;
@@ -71,8 +63,10 @@ export default {
   flex-direction: column;
   justify-content: center;
   padding: 100px;
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
+  background: linear-gradient(to right, #e0eafc, #cfdef3);
+
 }
 
 .login-box h2 {
@@ -96,7 +90,7 @@ export default {
 }
 
 .login-box button {
-  width: 100%;
+  width: 106%;
   padding: 12px;
   background-color: #3498db;
   color: white;
@@ -131,11 +125,6 @@ export default {
   .login-container {
     flex-direction: column;
   }
-
-  .login-image {
-    display: none;
-  }
-
   .login-box {
     flex: none;
     width: 100%;

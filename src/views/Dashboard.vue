@@ -1,8 +1,25 @@
 <template>
   <div class="dashboard-container">
-    <h2>Bem-vindo à Dashboard!</h2>
-    <p>Você está logado como <strong>{{ user?.name }}</strong>.</p>
-    <button @click="logout">Sair</button>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2 class="sidebar-title">Painel</h2>
+      <ul>
+        <li @click="toggleAdmin">
+          <span>Administração</span>
+          <ul v-if="showAdmin" class="submenu">
+            <li>
+              <router-link to="/clientes">Clientes</router-link>
+            </li>
+            <!-- Adicione mais submenus aqui -->
+          </ul>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Conteúdo principal -->
+    <main class="main-content">
+      <router-view />
+    </main>
   </div>
 </template>
 
@@ -10,22 +27,12 @@
 export default {
   data() {
     return {
-      user: null,
+      showAdmin: false,
     };
   },
-  created() {
-    const userStorage = localStorage.getItem('user');
-    if (userStorage) {
-      this.user = JSON.parse(userStorage);
-    } else {
-      this.$router.push('/login'); 
-    }
-  },
   methods: {
-    logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      this.$router.push('/login');
+    toggleAdmin() {
+      this.showAdmin = !this.showAdmin;
     },
   },
 };
@@ -33,7 +40,60 @@ export default {
 
 <style scoped>
 .dashboard-container {
-  padding: 2rem;
-  text-align: center;
+  display: flex;
+  min-height: 100vh;
+  background: #f5f6fa;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px;
+}
+
+.sidebar-title {
+  font-size: 20px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.sidebar li span {
+  font-weight: 500;
+}
+
+.submenu {
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.submenu li {
+  margin: 5px 0;
+}
+
+.submenu a {
+  color: #ecf0f1;
+  text-decoration: none;
+}
+
+.submenu a:hover {
+  text-decoration: underline;
+}
+
+/* Conteúdo principal */
+.main-content {
+  flex: 1;
+  padding: 30px;
 }
 </style>

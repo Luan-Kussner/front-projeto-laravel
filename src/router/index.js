@@ -9,9 +9,14 @@ const routes = [
   { path: '/register', component: Register },
   {
     path: '/dashboard',
-    component: Dashboard,
-    meta: { requiresAuth: true }
-  },
+    component: () => import('../views/Dashboard.vue'),
+    children: [
+      {
+        path: '/clientes',
+        component: () => import('../views/clientes/Clientes.vue')
+      }
+    ]
+  }
 ];
 
 const router = createRouter({
