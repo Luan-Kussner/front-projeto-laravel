@@ -25,8 +25,8 @@
       <button
         v-if="typeInputPassword === 'password'"
         type="button"
-        @click="togglePasswordVisibility"
-        class="p-1"
+        @click="typeInputPassword = 'text'"
+         class="p-1"
       >
         <i class="bi bi-eye text-xl"></i>
       </button>
@@ -34,8 +34,8 @@
       <button
         v-else
         type="button"
-        @click.prevent="togglePasswordVisibility"
-        class="p-1"
+        @click.prevent="typeInputPassword = 'password'"
+         class="p-1"
       >
         <i class="bi bi-eye-slash text-xl"></i>
       </button>
@@ -48,7 +48,7 @@
       <button
         type="button"
         class="bg-emerald-400 text-white rounded-md p-2 flex justify-center"
-        @click="signIn"
+        @click="signIn()"
         :disabled="disabledSendBtn || loading"
       >
         <Spinner v-if="loading" :size="'h-6 w-6'" />
@@ -75,7 +75,7 @@
 
 <script setup>
 import api from "@/services/Api";
-import { computed, ref } from "vue";
+import { computed, defineEmits, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import toast from "@/services/Toast";
 import { authUser } from "@/store/authStore";
@@ -95,14 +95,14 @@ const disabledSendBtn = computed(() => !email.value || !password.value);
 const signIn = async () => {
   try {
     loading.value = true;
-    const { status, data } = await api.post("/login", {
+    const { status, data } = await api.post("/auth/login", {
       email: email.value,
       password: password.value,
     });
 
     useAuthStore.setUser(data);
-    if (status === 200) {
-      if (route.params?.callback) {
+    if(status === 200) {
+     if(route.params?.callback) {
         return router.push(route.params.callback);
       }
 
@@ -110,7 +110,7 @@ const signIn = async () => {
     }
   } catch (err) {
     if (err?.response && err?.response?.data) {
-      err.response.data.errors.forEach((error) => {
+      err.response.data.errors.map((error) => {
         toast.error(error.message, {
           autoClose: false,
         });
@@ -119,10 +119,6 @@ const signIn = async () => {
   } finally {
     loading.value = false;
   }
-};
-
-const togglePasswordVisibility = () => {
-  typeInputPassword.value = typeInputPassword.value === "password" ? "text" : "password";
 };
 </script>
 

@@ -3,9 +3,8 @@ import App from './App.vue'
 import router from './router'
 import VueTheMask from 'vue-the-mask'
 import { createPinia } from 'pinia'
-import money from "v-money3"
+import money from "v-money"
 import Vue3Toasity from 'vue3-toastify';
-
 
 const pinia = createPinia()
 const app = createApp(App)

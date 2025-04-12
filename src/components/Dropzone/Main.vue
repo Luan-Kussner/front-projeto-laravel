@@ -18,12 +18,12 @@
             <span class="text-white"> Importando... </span>
             <span class="text-white fs-12">Isso pode levar alguns minutos</span>
           </div>
-          <span>
-            {{ titleDropzone }}
+          <span
+            >{{titleDropzone}}
             <br />
-            <span class="text-sm">
-              Aceitamos apenas arquivos '.jpg', '.jpeg' ou '.png'
-            </span>
+            <span class="text-sm"
+              >Aceitamos apenas arquivos '.jpg', '.jpeg' ou '.png'</span
+            >
           </span>
           <div class="group-files w-full mt-3">
             <p
@@ -54,7 +54,7 @@
           type="file"
           id="upload"
           :accept="acceptTypes"
-          @change="onInputChange"
+          @change.prevent="onInputChange($event)"
         />
       </div>
     </div>
@@ -62,28 +62,24 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, defineEmits, defineProps, computed } from "vue";
 import toast from "@/services/Toast";
 
-// Reactive references
 const isDragging = ref(false);
 const dragCount = ref(0);
 const listFilesUpload = ref([]);
 const acceptTypes = ref([".jpg", ".jpeg", ".png"]);
 
-// Props
-const props = defineProps({
-  titleDropzone: String,
-  isLoading: Boolean
-});
-
-// Events
 const emit = defineEmits(["onFileUpload"]);
+const props = defineProps(["titleDropzone", "isLoading"]);
 
-// Handlers for drag and drop
+const titleDropzone = computed(() => props.titleDropzone);
+
 const OnDragEnter = () => {
   dragCount.value++;
   isDragging.value = true;
+
+  return false;
 };
 
 const OnDragLeave = () => {
@@ -93,54 +89,59 @@ const OnDragLeave = () => {
 
 const onDrop = (e) => {
   const files = e.dataTransfer.files;
+
   isDragging.value = false;
 
-  [...files].forEach((file) => {
+  [...files].map((file) => {
     const ext = file?.name.split(".").pop();
+
     if (acceptTypes.value.includes("." + ext)) {
-      listFilesUpload.value = [file];
-      emit("onFileUpload", listFilesUpload.value);
-    } else {
-      showErrorMessage();
+        listFilesUpload.value = [file];
+        
+        return emit("onFileUpload", listFilesUpload.value);
     }
+
+    const message = `<div class="flex flex-col">
+        <h3 class="font-semibold">Tipo de arquivo não suportado!</h3>
+        <p>Aceitamos apenas arquivos de extensão '.zip'.</p>
+      </div>`;
+
+    toast.error(message, {
+      timer: 3000,
+      dangerouslyHTMLString: true,
+    });
   });
 };
 
-// Handle file input change
+const removeFile = (pos) => {
+    listFilesUpload.value.splice(pos, 1);
+        
+    return emit("onFileUpload", listFilesUpload.value);
+};
+
 const onInputChange = (e) => {
   const files = e.target.files;
-  [...files].forEach((file) => {
+
+  [...files].map((file) => {
     const ext = file?.name.split(".").pop();
+
     if (acceptTypes.value.includes("." + ext)) {
-      listFilesUpload.value = [file];
-      emit("onFileUpload", listFilesUpload.value);
-    } else {
-      showErrorMessage();
+        listFilesUpload.value = [file];
+        
+        return emit("onFileUpload", listFilesUpload.value);
     }
-  });
-};
 
-// Remove file from list
-const removeFile = (index) => {
-  listFilesUpload.value.splice(index, 1);
-  emit("onFileUpload", listFilesUpload.value);
-};
+    const message = `<div class="flex flex-col">
+        <h3 class="font-semibold">Tipo de arquivo não suportado!</h3>
+        <p>Aceitamos apenas arquivos de extensão '.zip'.</p>
+      </div>`;
 
-// Show error message for unsupported file types
-const showErrorMessage = () => {
-  const message = `
-    <div class="flex flex-col">
-      <h3 class="font-semibold">Tipo de arquivo não suportado!</h3>
-      <p>Aceitamos apenas arquivos de extensão '.jpg', '.jpeg' ou '.png'.</p>
-    </div>
-  `;
-  toast.error(message, {
-    timer: 3000,
-    dangerouslyHTMLString: true,
+    toast.error(message, {
+      timer: 3000,
+      dangerouslyHTMLString: true,
+    });
   });
 };
 </script>
 
-<style scoped>
-/* Add any specific styles for this component */
-</style>
+<style src="./Style.css" scoped />

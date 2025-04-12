@@ -2,7 +2,7 @@
   <section class="mt-5 font-medium">
     <div class="w-full mt-5 text-start flex justify-between items-center px-10">
       <h1 class="w-1/2 text-2xl font-semibold text-slate-900">
-        <i :class="['bi', icon]"></i> {{ title }}
+        <i :class="['bi', props.icon]"></i> {{ props.title }}
       </h1>
 
       <div class="w-1/2 flex items-center justify-end gap-1">
@@ -40,18 +40,23 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { defineProps, defineEmits, ref, watch } from "vue";
 
-// Props são automaticamente reconhecidas
-const { title, placeholder, newItem, searchItem, icon } = defineProps();
+const props = defineProps([
+  "title",
+  "placeholder",
+  "newItem",
+  "searchItem",
+  "icon",
+]);
 
-// Emissão do evento
 const emit = defineEmits(["resetGet"]);
 const search = ref("");
 
-// Watch para resetar busca
 watch(search, (newValue) => {
-  if (newValue.length === 0) emit("resetGet");
+  if (newValue.length == 0) 
+    return emit("resetGet");
+
 });
 </script>
 

@@ -123,7 +123,7 @@
   
 <script setup>
 import api from "@/services/Api";
-import { computed, ref, watch } from "vue";
+import { computed, defineEmits, ref, watch } from "vue";
 import toast from "@/services/Toast";
 import { validateEmail, formatDate } from "@/services/Helper";
 import Spinner from "@/components/Spinner/Main.vue";
@@ -231,7 +231,7 @@ const register = async () => {
   try {
     loading.value = true;
 
-    const { status } = await api.post("/register", {
+    const { status } = await api.post("/auth/register", {
       email: email.value,
       password: password.value,
       confirmPassword: confirmPassword.value,

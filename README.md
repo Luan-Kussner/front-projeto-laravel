@@ -6,4 +6,4 @@ npm install vue-the-mask
 npm install pinia
 npm install v-money3
 npm install tailwindcss autoprefixer
-npm run dev
+npm run serve

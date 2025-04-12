@@ -53,7 +53,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { defineProps, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import Spinner from "@/components/Spinner/Main.vue";
 

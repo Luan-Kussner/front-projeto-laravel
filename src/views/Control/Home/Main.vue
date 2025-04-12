@@ -6,7 +6,7 @@
       placeholder="Busque pelo nome do cliente ou descrição do produto"
       :newItem="addNewControl"
       :searchItem="getClientOrProductByName"
-       @resetGet="getControl"
+       @resetGet="getControls"
     >
       <template v-slot:lista>
         <div
@@ -70,7 +70,7 @@
             <div>
               <span class="text-sm text-slate-500"> Total: </span>
               <span class="fs-5">
-                {{ formatMoneyPtBr(control.valuecontrol) }}
+                {{ formatMoneyPtBr(control.valueControl) }}
               </span>
             </div>
           </div>
@@ -123,16 +123,16 @@ const pageSize = ref(10);
 const isLoading = ref(false);
 
 onMounted(() => {
-  getControl();
+  getControls();
 });
 
 watch(pageNumber, () => {
-  getControl();
+  getControls();
 });
 
 watch(pageSize, () => {
   pageNumber.value = 1;
-  getControl();
+  getControls();
 });
 
 const getClientOrProductByName = async (nameOrdescription) => {
@@ -145,7 +145,7 @@ const getClientOrProductByName = async (nameOrdescription) => {
   isLoading.value = false;
 };
 
-const getControl = async () => {
+const getControls = async () => {
   try {
     isLoading.value = true;
     controls.value = [];
@@ -185,11 +185,11 @@ const getControl = async () => {
 };
 
 const addNewControl = () => {
-  router.push({ name: "formcontrols", params: { id: "novo" } });
+  router.push({ name: "formControls", params: { id: "novo" } });
 };
 
 const updateControl = (idUpdate) => {
-  router.push({ name: "formcontrols", params: { id: idUpdate } });
+  router.push({ name: "formControls", params: { id: idUpdate } });
 };
 
 const deleteControl = async (id) => {
@@ -211,7 +211,7 @@ const deleteControl = async (id) => {
         showConfirmButton: false,
         timer: 1500,
       });
-      getControl();
+      getControls();
     }
   });
 };

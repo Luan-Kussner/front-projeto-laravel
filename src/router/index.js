@@ -15,15 +15,15 @@ const routes = [
       },
       {
         path: "/vendas",
-        name: "control",
+        name: "controls",
         component: () =>
-          import(/* webpackChunkName: "control" */ "@/views/Control/Main.vue"),
+          import(/* webpackChunkName: "controls" */ "@/views/Control/Main.vue"),
         children: [
           {
             path: "",
             name: "homeControl",
             component: () => import(
-              /* webpackChunkName: "control" */ "@/views/Control/Home/Main.vue" 
+              /* webpackChunkName: "controls" */ "@/views/Control/Home/Main.vue"
             ),
           },
           {
@@ -32,7 +32,7 @@ const routes = [
             meta: { auth: true },
             component: () =>
               import(
-                /* webpackChunkName: "Control" */ "@/views/Control/Form/Main.vue"
+                /* webpackChunkName: "controls" */ "@/views/Control/Form/Main.vue"
               ),
           },
         ],
