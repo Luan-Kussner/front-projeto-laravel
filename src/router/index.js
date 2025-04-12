@@ -1,37 +1,113 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import Login from '../views/Login.vue';
-import Register from '../views/Register.vue';
-import Dashboard from '../views/Dashboard.vue';
+import { createRouter, createWebHistory } from "vue-router";
+import beforeEach from "./beforeEach";
 
 const routes = [
-  { path: '/', redirect: '/login' },
-  { path: '/login', component: Login },
-  { path: '/register', component: Register },
   {
-    path: '/dashboard',
-    component: () => import('../views/Dashboard.vue'),
+    path: "/",
+    name: "layout",
+    component: () =>
+      import(/* webpackChunkName: "layout" */ "@/views/Layout/Main.vue"),
     children: [
       {
-        path: '/clientes',
-        component: () => import('../views/clientes/Clientes.vue')
-      }
-    ]
+        path: "/",
+        name: "dashboard",
+        component: () => import("@/views/Dashboard/Main.vue"),
+      },
+      {
+        path: "/vendas",
+        name: "control",
+        component: () =>
+          import(/* webpackChunkName: "control" */ "@/views/Control/Main.vue"),
+        children: [
+          {
+            path: "",
+            name: "homeControl",
+            component: () => import(
+              /* webpackChunkName: "control" */ "@/views/Control/Home/Main.vue" 
+            ),
+          },
+          {
+            path: "adicionar/:id",
+            name: "formControl",
+            meta: { auth: true },
+            component: () =>
+              import(
+                /* webpackChunkName: "Control" */ "@/views/Control/Form/Main.vue"
+              ),
+          },
+        ],
+      },
+      {
+        path: "/clientes",
+        name: "clients",
+        component: () =>
+          import(/* webpackChunkName: "client" */ "@/views/Clients/Main.vue"),
+        children: [
+          {
+            path: "",
+            name: "homeClients",
+            component: () => import(
+              /* webpackChunkName: "client" */ "@/views/Clients/Home/Main.vue"
+            ),
+          },
+          {
+            path: "adicionar/:id",
+            name: "formClients",
+            meta: { auth: true },
+            component: () =>
+              import(
+                /* webpackChunkName: "client" */ "@/views/Clients/Form/Main.vue"
+              ),
+          },
+        ],
+      },
+      {
+        path: "/produtos",
+        name: "products",
+        component: () =>
+          import(/* webpackChunkName: "product" */ "@/views/Products/Main.vue"),
+        children: [
+          {
+            path: "",
+            name: "homeProducts",
+            component: () =>
+              import(
+                /* webpackChunkName: "product" */ "@/views/Products/Home/Main.vue"
+              ),
+          },
+          {
+            path: "adicionar/:id",
+            name: "formProducts",
+            meta: { auth: true },
+            component: () =>
+              import(
+                /* webpackChunkName: "product" */ "@/views/Products/Form/Main.vue"
+              ),
+          },
+        ],
+      },
+      {
+        path: "/perfil",
+        name: "profile",
+        meta: { auth: true },
+        component: () =>
+          import(/* webpackChunkName: "product" */ "@/views/Profile/Main.vue"),
+      },
+    ],
+  },
+  {
+    path: "/inicio/:callback?",
+    name: "init",
+    component: () => import(/* webpackChunkName: "init" */ "@/views/Init/Main.vue"),
   }
 ];
 
+
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 
-// Navigation Guard
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem('token');
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login');
-  } else {
-    next();
-  }
-});
+router.beforeEach(beforeEach);
 
 export default router;
