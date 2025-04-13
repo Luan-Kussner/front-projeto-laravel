@@ -5,19 +5,20 @@ import api from "@/services/Api.js";
 export const authUser = defineStore("authUser", () => {
   const user = reactive({
     id: null,
-    fullName: null,
+    name: null,
     email: null,
-    role: null,
+    is_admin: null,
     token: null,
   });
 
   const getUser = computed(() => user);
   const getToken = computed(() => user.token);
 
-  const setUser = ({ id, fullName, email, token }) => {
+  const setUser = ({ user: { id, name, email, is_admin }, token }) => {
     user.id = id;
-    user.fullName = fullName;
+    user.name = name;
     user.email = email;
+    user.is_admin = is_admin;
     user.token = token;
 
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -25,12 +26,12 @@ export const authUser = defineStore("authUser", () => {
   };
 
   const setLocalStorage = (token) => {
-    localStorage.setItem("@control", JSON.stringify(token));
+    localStorage.setItem("@token", JSON.stringify(token));
   };
 
   const getTokenStorage = () => {
     return new Promise((resolve, reject) => {
-      const storage = localStorage.getItem("@control");
+      const storage = localStorage.getItem("@token");
 
       if (storage) {
         const token = JSON.parse(storage);
@@ -67,7 +68,7 @@ export const authUser = defineStore("authUser", () => {
     user.token = null;
 
     delete api.defaults.headers.common["Authorization"];
-    localStorage.removeItem("@control");
+    localStorage.removeItem("@token");
   };
 
   return {

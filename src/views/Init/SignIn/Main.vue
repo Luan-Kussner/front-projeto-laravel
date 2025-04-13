@@ -100,26 +100,29 @@ const signIn = async () => {
       password: password.value,
     });
 
-    useAuthStore.setUser(data);
-    if(status === 200) {
-     if(route.params?.callback) {
+    if (status === 200) {
+      useAuthStore.setUser({
+        user: data.user,
+        token: data.token,
+      });
+
+      if (route.params?.callback) {
         return router.push(route.params.callback);
       }
 
       router.push("/");
     }
   } catch (err) {
-    if (err?.response && err?.response?.data) {
-      err.response.data.errors.map((error) => {
-        toast.error(error.message, {
-          autoClose: false,
-        });
+    if (err?.response?.data) {
+      toast.error(err.response.data.message || "Erro ao fazer login", {
+        autoClose: false,
       });
     }
   } finally {
     loading.value = false;
   }
 };
+
 </script>
 
 <style scoped>

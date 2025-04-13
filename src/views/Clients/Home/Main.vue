@@ -134,7 +134,7 @@ const getClientByName = async (name) => {
   try {
     isLoading.value = true;
     clients.value = [];
-    const { data } = await api.get(`/client/${name}`);
+    const { data } = await api.get(`/clientes/${name}`);
     if (data) clients.value = data;
   } catch (err) {
     if (err?.response && err?.response?.data) {
@@ -167,7 +167,7 @@ const getClients = async () => {
     isLoading.value = true;
     clients.value = [];
     const { data } = await api.get(
-      `/client?pageNumber=${pageNumber.value}&pageSize=${pageSize.value}`
+      `/clientes?pageNumber=${pageNumber.value}&pageSize=${pageSize.value}`
     );
     if (data) {
       totalItems.value = data.totalItems;
@@ -221,7 +221,7 @@ const deleteClient = async (id) => {
     cancelButtonText: "Não",
   }).then(async (result) => {
     if (result.isConfirmed) {
-      await api.delete(`/client/${id}`);
+      await api.delete(`/clientes/${id}`);
       Swal.fire({
         icon: "success",
         title: "Cliente apagado com sucesso!",

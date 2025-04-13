@@ -63,7 +63,7 @@ const registerClient = async () => {
   try {
     isLoading.value = true;
 
-    const { status } = await api.post("/client", {
+    const { status } = await api.post("/clientes", {
       name: name.value,
       city: city.value,
     });
@@ -111,7 +111,7 @@ const updateClient = async () => {
   try {
     isLoading.value = true;
 
-    const { status } = await api.put("/client", {
+    const { status } = await api.put("/clientes", {
       id: idUpdate.value,
       name: name.value,
       city: city.value,
@@ -160,7 +160,7 @@ const getClientBy = async () => {
   try {
     isLoading.value = true;
 
-    const { data } = await api.get(`/client/${idUpdate.value}`);
+    const { data } = await api.get(`/clientes/${idUpdate.value}`);
 
     if (data) {
       name.value = data.name;
