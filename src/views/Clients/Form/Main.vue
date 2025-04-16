@@ -20,12 +20,12 @@
         </div>
 
         <div class="flex flex-col justify-start items-start mt-5">
-          <label for="" class="test-start">Cidade</label>
+          <label for="" class="test-start">telefone</label>
           <input
             type="text"
             class="w-full p-2 rounded-md outline-0 border focus:border-b-emerald-400"
-            placeholder="Informe a cidade"
-            v-model="city"
+            placeholder="Informe o Telefone"
+            v-model="telefone"
             :disabled="isLoading"
           />
         </div>
@@ -46,7 +46,6 @@ const router = useRouter();
 const idUpdate = computed(() => route.params.id);
 const isLoading = ref(false);
 const name = ref("");
-const city = ref("");
 
 onMounted(() => {
   if (idUpdate.value != "novo") {
@@ -54,7 +53,7 @@ onMounted(() => {
   }
 });
 
-const disabledSendBtn = computed(() => name.value == "" || city.value == "");
+const disabledSendBtn = computed(() => name.value == "");
 const titlePage = computed(() =>
   idUpdate.value == "novo" ? "Cadastrar novo cliente" : "Editar cliente"
 );
@@ -65,7 +64,6 @@ const registerClient = async () => {
 
     const { status } = await api.post("/clientes", {
       name: name.value,
-      city: city.value,
     });
 
     if (status == 201) {
@@ -77,7 +75,6 @@ const registerClient = async () => {
       });
 
       name.value = "";
-      city.value = "";
 
       router.back();
     }
@@ -114,7 +111,6 @@ const updateClient = async () => {
     const { status } = await api.put("/clientes", {
       id: idUpdate.value,
       name: name.value,
-      city: city.value,
     });
 
     if (status == 200) {
@@ -126,7 +122,6 @@ const updateClient = async () => {
       });
 
       name.value = "";
-      city.value = "";
 
       router.back();
     }
@@ -164,7 +159,6 @@ const getClientBy = async () => {
 
     if (data) {
       name.value = data.name;
-      city.value = data.city;
     }
   } catch (err) {
     if (err?.response && err?.response?.data) {

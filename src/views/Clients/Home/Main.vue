@@ -73,15 +73,15 @@
             <div class="">
               <div
                 class="truncate cursor-pointer flex justify-center"
-                :title="client.name"
+                :title="client.nome"
               >
               <span class="text-lg text-center">
-                {{ client.name }}
+                {{ client.nome }}
               </span>
               </div>
 
               <div class="mb-3 items-center flex justify-center">
-                <span class="text-sm text-slate-500">{{ client.city }}</span>
+                <span class="text-sm text-slate-500">{{ client.telefone }}</span>
               </div>
             </div>
           </div>
@@ -187,7 +187,7 @@ const getClients = async () => {
         icon: "error",
         html: errors,
         showConfirmButton: false,
-        timer: err.response.data.errors.lenght > 1 ? 3000 : 2500,
+        timer: err.response.data.errors.length > 1 ? 3000 : 2500,
       });
     }
 

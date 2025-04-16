@@ -26,7 +26,8 @@ export const authUser = defineStore("authUser", () => {
   };
 
   const setLocalStorage = (token) => {
-    localStorage.setItem("@token", JSON.stringify(token));
+    const tokenOnly = token.includes('|') ? token.split('|')[1] : token;
+    localStorage.setItem("@token", tokenOnly);
   };
 
   const getTokenStorage = () => {
@@ -34,7 +35,7 @@ export const authUser = defineStore("authUser", () => {
       const storage = localStorage.getItem("@token");
 
       if (storage) {
-        const token = JSON.parse(storage);
+        const token = storage;
 
         if (token)
           api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
