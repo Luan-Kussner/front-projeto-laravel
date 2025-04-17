@@ -263,7 +263,6 @@ const getProductById = async () => {
         const mimeType = result.headers["content-type"];
 
         const file = await urlToFile(data.pathImage, fileName + ext, mimeType);
-        console.log(file);
         listFilesUpload.value = [file];
       }
     }
