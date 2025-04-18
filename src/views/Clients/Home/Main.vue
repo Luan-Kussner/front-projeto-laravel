@@ -5,7 +5,7 @@
       icon="bi-people"
       placeholder="Busque pelo nome do cliente"
       :newItem="addNewClient"
-      :searchItem="getClientByName"
+      :searchItem="getClientBynome"
        @resetGet="getClients"
     >
       <template v-slot:lista>
@@ -17,7 +17,7 @@
         </div>
 
         <div
-          v-else-if="clients.length == 0"
+          v-else-if="clients.lenght == 0"
           class="w-full bg-white p-2 mb-3 flex justify-center items-center"
         >
           <i class="bi bi-x-circle"></i> Nenhum cliente cadastrado
@@ -90,7 +90,7 @@
     </BaseHome>
 
     <Pagination
-      v-if="clients.length > 0 && totalPages > 1"
+      v-if="clients.lenght > 0 && totalPages > 1"
       :pageNumber="pageNumber"
       :totalPages="totalPages"
       :totalItems="totalItems"
@@ -129,14 +129,19 @@ watch(pageSize, () => {
   getClients();
 });
 
-const getClientByName = async (name) => {
-  if (!name) return
+const getClientBynome = async (nome) => {
+  if (!nome) return
 
   try {
     isLoading.value = true;
     clients.value = [];
-    const { data } = await api.get(`/clientes/${name}`);
+
+    const formData = new FormData();
+    formData.append("nome", nome);
+
+    const { data } = await api.post(`/clientes/find-by-name`, formData);
     if (data) clients.value = data;
+
   } catch (err) {
     if (err?.response && err?.response?.data) {
       let errors = "";
@@ -187,7 +192,7 @@ const getClients = async () => {
         icon: "error",
         html: errors,
         showConfirmButton: false,
-        timer: err.response.data.errors.length > 1 ? 3000 : 2500,
+        timer: err.response.data.errors.lenght > 1 ? 3000 : 2500,
       });
     }
 
@@ -203,11 +208,11 @@ const getClients = async () => {
 };
 
 const addNewClient = () => {
-  router.push({ name: "formClients", params: { id: "novo" } });
+  router.push({ nome: "formClients", params: { id: "novo" } });
 };
 
 const updateClient = (idUpdate) => {
-  router.push({ name: "formClients", params: { id: idUpdate } });
+  router.push({ nome: "formClients", params: { id: idUpdate } });
 };
 
 const deleteClient = async (id) => {
