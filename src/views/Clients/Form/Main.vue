@@ -117,8 +117,18 @@ const registerClient = async () => {
   try {
     isLoading.value = true;
 
-    const { status } = await api.post("/clientes", {
-      nome: nome.value,
+    const formData = new FormData();
+    formData.append("nome", nome.value);
+    formData.append("telefone", telefone.value);
+    formData.append("endereco", endereco.value);
+    formData.append("numero", numero.value);
+    formData.append("bairro", bairro.value);
+    if (objectkey.value) {
+      formData.append("objectkey", objectkey.value);
+    }
+
+    const { status } = await api.post(`/clientes`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
     });
 
     if (status == 201) {
@@ -129,24 +139,27 @@ const registerClient = async () => {
         timer: 1500,
       });
 
-      nome.value = "";
+      nome.value = telefone.value = endereco.value = numero.value = bairro.value = "";
+      objectkey.value = null;
+      previewImage.value = null;
 
       router.back();
     }
   } catch (err) {
     if (err?.response && err?.response?.data) {
-      let errors = "";
-      err.response.data.errors.map((error) => {
-        errors += error.message + "<br />";
-      });
+    let errors = "";
+    err.response.data.errors.map((error) => {
+      errors += error + "<br />";
+    });
 
-      return Swal.fire({
-        icon: "error",
-        html: errors,
-        showConfirmButton: false,
-        timer: err.response.data.errors.lenght > 1 ? 3000 : 2500,
-      });
-    }
+    return Swal.fire({
+      icon: "error",
+      html: errors,
+      showConfirmButton: false,
+      timer: err.response.data.errors.length > 1 ? 3000 : 2500,
+    });
+  }
+
 
     Swal.fire({
       icon: "error",
@@ -231,7 +244,7 @@ const getClientBy = async () => {
         icon: "error",
         html: errors,
         showConfirmButton: false,
-        timer: err.response.data.errors.lenght > 1 ? 3000 : 2500,
+        timer: err.response.data.errors.length > 1 ? 3000 : 2500,
       });
     }
 
