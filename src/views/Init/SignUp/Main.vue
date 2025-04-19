@@ -79,15 +79,6 @@
       </button>
     </div>
 
-    <input
-      type="text"
-      placeholder="Data de nascimento"
-      class="mb-1 rounded-md p-2 outline-none border focus:border-b-emerald-400"
-      :class="{ 'mb-5': !disabledSendBtn }"
-      v-mask="'##/##/####'"
-      v-model="birthOfDate"
-    />
-
     <Transition>
       <div
         v-show="disabledSendBtn"
@@ -125,7 +116,7 @@
 import api from "@/services/Api";
 import { computed, defineEmits, ref, watch } from "vue";
 import toast from "@/services/Toast";
-import { validateEmail, formatDate } from "@/services/Helper";
+import { validateEmail } from "@/services/Helper";
 import Spinner from "@/components/Spinner/Main.vue";
 
 const emit = defineEmits(["styleInit"]);
@@ -134,7 +125,6 @@ const fullName = ref("");
 const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
-const birthOfDate = ref("");
 
 const typeInputPassword = ref("password");
 const typeInputConfirmPassword = ref("password");
@@ -148,8 +138,7 @@ const disabledSendBtn = computed(
     !realEmail.value ||
     !password.value ||
     !confirmPassword.value ||
-    !!passwordNotMatch.value ||
-    !birthOfDate.value
+    !!passwordNotMatch.value
 );
 
 const realEmail = computed(() => validateEmail(email.value));
@@ -186,58 +175,15 @@ watch([password, passwordNotMatch], () => {
   }
 });
 
-watch(birthOfDate, (newValue) => {
-  if (newValue.includes("/")) {
-    const [day, month, year] = newValue.split("/");
-
-    if (!day || !month || !year) return false;
-
-    if (month < 1 || month > 12) {
-      birthOfDate.value = "";
-      return toast.error(
-        `Data inválida. Informe uma data de nascimento válida.`,
-        {
-          autoClose: false,
-        }
-      );
-    }
-
-    const daysInMonth = year && month && new Date(year, month, 0).getDate();
-    if (day < 1 || day > daysInMonth) {
-      birthOfDate.value = "";
-      return toast.error(
-        `Data inválida. Informe uma data de nascimento válida.`,
-        {
-          autoClose: false,
-        }
-      );
-    }
-
-    // Validação do ano
-    const currentYear = new Date().getFullYear();
-    if ((year.length == 4 && year < 1900) || year > currentYear) {
-      birthOfDate.value = "";
-      return toast.error(
-        `Data inválida. Informe uma data de nascimento válida.`,
-        {
-          autoClose: false,
-        }
-      );
-    }
-  }
-});
-
 const register = async () => {
   try {
     loading.value = true;
 
     const { status } = await api.post("/auth/register", {
+      name: fullName.value,
       email: email.value,
       password: password.value,
-      confirmPassword: confirmPassword.value,
-      dateOfBirth: formatDate(birthOfDate.value),
-      userRole: 2,
-      fullName: fullName.value,
+      is_admin: 0
     });
 
     if (status === 200) {
@@ -259,7 +205,6 @@ const resetForm = () => {
   email.value = "";
   password.value = "";
   confirmPassword.value = "";
-  birthOfDate.value = "";
 };
 </script>
 
