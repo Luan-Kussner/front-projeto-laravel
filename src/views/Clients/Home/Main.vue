@@ -182,18 +182,29 @@ const getClients = async () => {
       clients.value = data.items;
     }
   } catch (err) {
-    if (err?.response && err?.response?.data) {
+    if (err?.response?.data) {
       let errors = "";
-      err.response.data.errors.map((error) => {
-        errors += error.message + "<br />";
-      });
 
-      return Swal.fire({
-        icon: "error",
-        html: errors,
-        showConfirmButton: false,
-        timer: err.response.data.errors.lenght > 1 ? 3000 : 2500,
-      });
+      const errorList = err.response.data.errors;
+      if (Array.isArray(errorList)) {
+        errorList.map((error) => {
+          errors += (error.message || "Erro desconhecido") + "<br />";
+        });
+
+        return Swal.fire({
+          icon: "error",
+          html: errors,
+          showConfirmButton: false,
+          timer: errorList.length > 1 ? 3000 : 2500,
+        });
+      } else {
+        return Swal.fire({
+          icon: "error",
+          text: err.response.data.message || "Erro desconhecido",
+          showConfirmButton: false,
+          timer: 2500,
+        });
+      }
     }
 
     Swal.fire({
