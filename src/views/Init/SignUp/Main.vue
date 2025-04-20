@@ -118,18 +118,17 @@ import { computed, defineEmits, ref, watch } from "vue";
 import toast from "@/services/Toast";
 import { validateEmail } from "@/services/Helper";
 import Spinner from "@/components/Spinner/Main.vue";
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const emit = defineEmits(["styleInit"]);
-
 const fullName = ref("");
 const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
-
 const typeInputPassword = ref("password");
 const typeInputConfirmPassword = ref("password");
 const loading = ref(false);
-
 const disabledSendBtn = computed(
   () =>
     !fullName.value ||
@@ -179,19 +178,24 @@ const register = async () => {
   try {
     loading.value = true;
 
-    const { status } = await api.post("/auth/register", {
+    const { data,status } = await api.post("/auth/register", {
       name: fullName.value,
       email: email.value,
       password: password.value,
       is_admin: 0
     });
-
-    if (status === 200) {
+    console.log(data,status);
+    if (status === 201) {
+      const tokenOnly = data.token.includes('|') ? data.token.split('|')[1] : data.token;
+      localStorage.setItem("@token", tokenOnly);
       toast.success(`Cadastrado realizado com sucesso!`, {
         autoClose: 3000,
       });
+
       emit("styleInit", "");
-      return resetForm();
+      resetForm();
+
+      router.push("/");
     }
   } catch (error) {
     console.log(error);
