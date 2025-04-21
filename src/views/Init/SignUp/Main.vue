@@ -188,7 +188,7 @@ const register = async () => {
     if (status === 201) {
       const tokenOnly = data.token.includes('|') ? data.token.split('|')[1] : data.token;
       localStorage.setItem("@token", tokenOnly);
-      toast.success(`Cadastrado realizado com sucesso!`, {
+      toast.success(`Cadastro realizado com sucesso!`, {
         autoClose: 3000,
       });
 
