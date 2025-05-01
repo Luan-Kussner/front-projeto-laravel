@@ -35,12 +35,12 @@
               class="w-full max-h-56 truncate flex items-center justify-center rounded-t-md"
             >
               <img
-                v-if="product.pathImage"
-                :src="product.pathImage"
-                alt="quebrou"
+                v-if="product.objectkey"
+                :src="product.objectkey"
+                @error="product.objectkey = null"
+                alt="Imagem quebrada"
                 class="bg-center h-56 bg-gray-300 w-full"
               />
-
               <div
                 v-else
                 class="flex justify-center items-center w-full h-56 bg-gray-300"
