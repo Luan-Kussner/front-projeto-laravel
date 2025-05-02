@@ -131,13 +131,18 @@ watch(pageSize, () => {
 });
 
 const getProductByDescription = async (description) => {
-  if (!description) return;
+  if (!description) return
 
   try {
     isLoading.value = true;
     products.value = [];
-    const { data } = await api.get(`/product/${description}`);
-    products.value = data;
+
+    const formData = new FormData();
+    formData.append("nome", description);
+
+    const { data } = await api.post(`/produtos/find-by-name`, formData);
+    if (data) products.value = data;
+
   } catch (err) {
     if (err?.response && err?.response?.data) {
       let errors = "";
@@ -171,7 +176,6 @@ const getProducts = async () => {
     const { data } = await api.get(
       `/produtos?pageNumber=${pageNumber.value}&pageSize=${pageSize.value}`
     );
-console.log(data);
     totalItems.value = data.totalItems;
     totalPages.value = data.totalPages;
     pageNumber.value = data.pageNumber;
