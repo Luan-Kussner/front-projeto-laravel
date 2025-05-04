@@ -9,12 +9,23 @@
     >
       <template v-slot:form>
         <div class="flex flex-col justify-start items-start">
-          <label for="" class="text-start">Descrição</label>
+          <label for="" class="text-start">Nome do produto</label>
           <input
             type="text"
             class="w-full p-2 rounded-md outline-none border focus:border-b-emerald-400"
-            placeholder="Informe a descrição do produto"
-            v-model="description"
+            placeholder="Informe o nome do produto"
+            v-model="nome"
+            :disabled="isLoading"
+          />
+        </div>
+
+        <div class="flex flex-col justify-start items-start  mt-5">
+          <label for="" class="text-start">Descrição do produto</label>
+          <input
+            type="text"
+            class="w-full p-2 rounded-md outline-none border focus:border-b-emerald-400"
+            placeholder="Informe o nome do produto"
+            v-model="descricao"
             :disabled="isLoading"
           />
         </div>
@@ -25,9 +36,20 @@
             type="text"
             class="w-full p-2 rounded-md outline-none border focus:border-b-emerald-400"
             placeholder="Informe o valor do produto"
-            v-model.lazy="unitaryValue"
+            v-model.lazy="preco"
             :disabled="isLoading"
             v-money="money"
+          />
+        </div>
+
+        <div class="flex flex-col justify-start items-start items-start mt-5">
+            <label for="" class="text-start">Quantidade disponível</label>
+          <input
+            type="text"
+            class="w-full p-2 rounded-md outline-none border focus:border-b-emerald-400"
+            placeholder="Informe a quantidade disponível"
+            v-model="estoque"
+            :disabled="isLoading"
           />
         </div>
 
@@ -67,8 +89,10 @@ const route = useRoute();
 const router = useRouter();
 const idUpdate = computed(() => route.params.id);
 const isLoading = ref(false);
-const description = ref(null);
-const unitaryValue = ref(null);
+const descricao = ref(null);
+const preco = ref(null);
+const nome = ref(null);
+const estoque = ref(null);
 
 const listFilesUpload = ref([]);
 
@@ -81,7 +105,7 @@ const money = ref({
 });
 
 const disabledSendBtn = computed(
-  () => !description.value || !unitaryValue.value
+  () => !descricao.value || !preco.value || !nome.value || !estoque.value
 );
 
 const titlePage = computed(() =>
@@ -97,9 +121,11 @@ onMounted(() => {
 const registerProduct = async () => {
   try {
     isLoading.value = true;
-    const { status, data } = await api.post("/product", {
-      description: description.value,
-      unitaryValue: convertCurrencyToFloat(unitaryValue.value),
+    const { status, data } = await api.post("/produtos", {
+      descricao: descricao.value,
+      preco: convertCurrencyToFloat(preco.value),
+      nome: nome.value,
+      estoque: estoque.value,
     });
 
     if (status == 201) {
@@ -111,8 +137,8 @@ const registerProduct = async () => {
             autoClose: 2500,
           });
 
-          description.value = null;
-          unitaryValue.value = null;
+          descricao.value = null;
+          preco.value = null;
 
           setTimeout(() => {
             return router.back();
@@ -125,8 +151,10 @@ const registerProduct = async () => {
         autoClose: 2500,
       });
 
-      description.value = null;
-      unitaryValue.value = null;
+      descricao.value = null;
+      preco.value = null;
+      nome.value = null;
+      estoque.value = null;
 
       setTimeout(() => {
         return router.back();
@@ -180,8 +208,8 @@ const updateProduct = async () => {
 
     const { status } = await api.put("/product", {
       id: idUpdate.value,
-      description: description.value,
-      unitaryValue: convertCurrencyToFloat(unitaryValue.value),
+      descricao: descricao.value,
+      preco: convertCurrencyToFloat(preco.value),
     });
 
     if (status == 200) {
@@ -194,8 +222,8 @@ const updateProduct = async () => {
               autoClose: 2500,
             });
 
-            description.value = null;
-            unitaryValue.value = null;
+            descricao.value = null;
+            preco.value = null;
 
             setTimeout(() => {
               return router.back();
@@ -221,8 +249,8 @@ const updateProduct = async () => {
       toast.success("Atualizado com sucesso!", {
         autoClose: 2500,
       });
-      description.value = null;
-      unitaryValue.value = null;
+      descricao.value = null;
+      preco.value = null;
 
       setTimeout(() => {
         return router.back();
@@ -251,8 +279,8 @@ const getProductById = async () => {
     const { data } = await api.get(`/product/${idUpdate.value}`);
 
     if (data) {
-      description.value = data.description;
-      unitaryValue.value = formatMoneyPtBr(data.unitaryValue);
+      descricao.value = data.descricao;
+      preco.value = formatMoneyPtBr(data.preco);
 
       if (data.pathImage != null) {
         let fileName = data.pathImage.split("/");
