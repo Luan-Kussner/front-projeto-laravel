@@ -53,19 +53,21 @@
           />
         </div>
 
-        <section class="mt-5">
-          <div
-            class="intro-y flex flex-col sm:flex-row items-center pb-2 border-b border-slate-200/60 dark:border-darkmode-400"
-          >
-            <h2 class="">Importe a imagem do produto</h2>
-          </div>
-          <div>
-            <Dropzone
-              titleDropzone="Arraste ou clique aqui para importar imagem do produto"
-              @onFileUpload="($event) => (listFilesUpload = $event)"
-            />
-          </div>
-        </section>
+        <div class="flex flex-col justify-start items-start mt-5">
+          <label for="" class="test-start">Foto do Cliente</label>
+          <input
+            type="file"
+            accept="image/*"
+            class="w-full p-2 rounded-md outline-0 border focus:border-b-emerald-400"
+            @change="handleImageUpload"
+            :disabled="isLoading"
+          />
+        </div>
+        <!-- Mostrar a imagem atual se tiver -->
+        <div v-if="previewImage" class="mt-3">
+          <label class="text-start block mb-1">Visualização da Imagem</label>
+          <img :src="previewImage" alt="Imagem do cliente" class="max-w-xs rounded-md border" />
+        </div>
       </template>
     </BaseForm>
   </section>
@@ -81,9 +83,9 @@ import {
   convertCurrencyToFloat,
   formatMoneyPtBr,
 } from "@/services/Helper";
-import Dropzone from "@/components/Dropzone/Main.vue";
 import toast from "@/services/Toast";
 import { VMoney } from "v-money";
+import Swal from "sweetalert2";
 
 const route = useRoute();
 const router = useRouter();
@@ -93,8 +95,8 @@ const descricao = ref(null);
 const preco = ref(null);
 const nome = ref(null);
 const estoque = ref(null);
-
-const listFilesUpload = ref([]);
+const objectkey = ref(null);
+const previewImage = ref(null);
 
 const money = ref({
   decimal: ",",
@@ -121,40 +123,34 @@ onMounted(() => {
 const registerProduct = async () => {
   try {
     isLoading.value = true;
-    const { status, data } = await api.post("/produtos", {
-      descricao: descricao.value,
-      preco: convertCurrencyToFloat(preco.value),
-      nome: nome.value,
-      estoque: estoque.value,
+
+    const formData = new FormData();
+    formData.append("nome", nome.value);
+    formData.append("preco", convertCurrencyToFloat(preco.value));
+    formData.append("estoque", estoque.value);
+    formData.append("descricao", descricao.value);
+    if (objectkey.value) {
+      formData.append("objectkey", objectkey.value);
+    }
+
+    const { status } = await api.post(`/produtos`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
     });
 
+
     if (status == 201) {
-      if (listFilesUpload.value.length > 0) {
-        const status = await sendImageProduct(data.id);
-
-        if (status == 200) {
-          toast.success("Cadastrado com sucesso!", {
-            autoClose: 2500,
-          });
-
-          descricao.value = null;
-          preco.value = null;
-
-          setTimeout(() => {
-            return router.back();
-          }, 2500);
-        }
-      }
-
-      await removeImageProduct(data.id);
-      toast.success("Cadastrado com sucesso!", {
-        autoClose: 2500,
+      Swal.fire({
+        icon: "success",
+        title: "Cadastrado com sucesso!",
+        showConfirmButton: false,
+        timer: 1500,
       });
 
       descricao.value = null;
       preco.value = null;
       nome.value = null;
       estoque.value = null;
+      objectkey.value = null;
 
       setTimeout(() => {
         return router.back();
@@ -162,15 +158,25 @@ const registerProduct = async () => {
     }
   } catch (err) {
     if (err?.response && err?.response?.data) {
-      err.response.data.errors.map((error) => {
-        return toast.error(error, {
-          autoClose: 3500,
-        });
-      });
-    }
+    let errors = "";
+    err.response.data.errors.map((error) => {
+      errors += error + "<br />";
+    });
 
-    return toast.error("Algo deu errado. Tente novamente.", {
-      autoClose: 3500,
+    return Swal.fire({
+      icon: "error",
+      html: errors,
+      showConfirmButton: false,
+      timer: err.response.data.errors.length > 1 ? 3000 : 2500,
+    });
+  }
+
+
+    Swal.fire({
+      icon: "error",
+      text: "Algo deu errado. Tente novamente",
+      showConfirmButton: false,
+      timer: 2500,
     });
   } finally {
     isLoading.value = false;
@@ -180,7 +186,7 @@ const registerProduct = async () => {
 const sendImageProduct = async (id) => {
   const formData = new FormData();
 
-  listFilesUpload.value.forEach((item) => {
+  objectkey.value.forEach((item) => {
     formData.append("File", item);
   });
 
@@ -213,7 +219,7 @@ const updateProduct = async () => {
     });
 
     if (status == 200) {
-      if (listFilesUpload.value.length > 0) {
+      if (objectkey.value.length > 0) {
         try {
           const status = await sendImageProduct(idUpdate.value);
 
@@ -291,7 +297,7 @@ const getProductById = async () => {
         const mimeType = result.headers["content-type"];
 
         const file = await urlToFile(data.pathImage, fileName + ext, mimeType);
-        listFilesUpload.value = [file];
+        objectkey.value = [file];
       }
     }
   } catch (err) {
@@ -319,4 +325,13 @@ const urlToFile = async (url, filename, mimeType) => {
   // Criar um arquivo a partir do Blob
   return new File([blob], filename, { type: mimeType });
 };
+
+const handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    objectkey.value = file;
+    previewImage.value = URL.createObjectURL(file); 
+  }
+};
+
 </script>

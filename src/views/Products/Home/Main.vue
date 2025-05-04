@@ -68,22 +68,22 @@
               </button>
             </div>
 
-            <div class="">
-              <div
-                class="truncate flex justify-center"
-                :title="product.nome"
-              >
-                <span class="text-lg text-center">
-                  {{ product.nome.toUpperCase() }}
-                </span>
-              </div>
-
-              <div class="mb-3 items-center flex justify-center">
-                <span class="text-sm text-slate-500">
-                  {{ formatMoneyPtBr(product.preco) }}
-                </span>
-              </div>
+            <div class="p-3">
+            <div class="truncate" :title="product.nome">
+              <span class="text-sm font-semibold text-gray-600">Descrição: </span>
+              <span class="text-base">{{ product.nome.toUpperCase() }}</span>
             </div>
+
+            <div class="truncate mt-2">
+              <span class="text-sm font-semibold text-gray-600">Preço: </span>
+              <span class="text-sm text-slate-500">{{ formatMoneyPtBr(product.preco) }}</span>
+            </div>
+
+            <div class="truncate mt-2">
+              <span class="text-sm font-semibold text-gray-600">Quantidade: </span>
+              <span class="text-sm text-slate-500">{{ product.estoque }}</span>
+            </div>
+          </div>
           </div>
         </div>
       </template>
