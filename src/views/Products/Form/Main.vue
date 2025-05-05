@@ -212,68 +212,34 @@ const updateProduct = async () => {
   try {
     isLoading.value = true;
 
-    const { status } = await api.put("/product", {
-      id: idUpdate.value,
-      descricao: descricao.value,
-      preco: convertCurrencyToFloat(preco.value),
+    const formData = new FormData();
+    formData.append("nome", nome.value);
+    formData.append("preco", convertCurrencyToFloat(preco.value));
+    formData.append("estoque", estoque.value);
+    formData.append("descricao", descricao.value);
+    if (objectkey.value) {
+      formData.append("objectkey", objectkey.value);
+    }
+    const { status } = await api.post(`/produtos/${idUpdate.value}?_method=PUT`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
     });
 
-    if (status == 200) {
-      if (objectkey.value.length > 0) {
-        try {
-          const status = await sendImageProduct(idUpdate.value);
-
-          if (status == 200) {
-            toast.success("Atualizado com sucesso!", {
-              autoClose: 2500,
-            });
-
-            descricao.value = null;
-            preco.value = null;
-
-            setTimeout(() => {
-              return router.back();
-            }, 2500);
-          }
-        } catch (err) {
-          if (err?.response && err?.response?.data) {
-            err.response.data.errors.map((error) => {
-              return toast.error(error, {
-                autoClose: 3500,
-              });
-            });
-          }
-
-          return toast.error("Algo deu errado. Tente novamente.", {
-            autoClose: 3500,
-          });
-        }
-      }
-
-      await removeImageProduct(idUpdate.value);
-
-      toast.success("Atualizado com sucesso!", {
-        autoClose: 2500,
+    if (status === 200) {
+      Swal.fire({
+        icon: "success",
+        title: "Atualizado com sucesso!",
+        showConfirmButton: false,
+        timer: 1500,
       });
-      descricao.value = null;
-      preco.value = null;
 
-      setTimeout(() => {
-        return router.back();
-      }, 2500);
+      nome.value = preco.value = estoque.value = descricao.value = "";
+      objectkey.value = null;
+      previewImage.value = null;
+
+      router.back();
     }
   } catch (err) {
-    if (err?.response && err?.response?.data) {
-      err.response.data.errors.map((error) => {
-        return toast.error(error, {
-                autoClose: 3500,
-        });
-      });
-    }
-
-    return toast.error("Algo deu errado. Tente novamente.", {
-      autoClose: 3500,
-    });
+    handleRequestError(err);
   } finally {
     isLoading.value = false;
   }
@@ -332,6 +298,29 @@ const handleImageUpload = (event) => {
     objectkey.value = file;
     previewImage.value = URL.createObjectURL(file); 
   }
+};
+
+const handleRequestError = (err) => {
+  if (err?.response && err?.response?.data) {
+    let errors = "";
+    err.response.data.errors?.forEach((error) => {
+      errors += error.message + "<br />";
+    });
+
+    return Swal.fire({
+      icon: "error",
+      html: errors || "Erro ao processar a requisição.",
+      showConfirmButton: false,
+      timer: err.response.data.errors?.length > 1 ? 3000 : 2500,
+    });
+  }
+
+  Swal.fire({
+    icon: "error",
+    text: "Algo deu errado. Tente novamente.",
+    showConfirmButton: false,
+    timer: 2500,
+  });
 };
 
 </script>
