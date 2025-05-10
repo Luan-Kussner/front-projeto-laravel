@@ -183,31 +183,6 @@ const registerProduct = async () => {
   }
 };
 
-const sendImageProduct = async (id) => {
-  const formData = new FormData();
-
-  objectkey.value.forEach((item) => {
-    formData.append("File", item);
-  });
-
-  formData.append("Id", id);
-
-  try {
-    const { status } = await api.post("/product/file", formData);
-    return status;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-const removeImageProduct = async (id) => {
-  try {
-    await api.delete(`/product/file/${id}`);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 const updateProduct = async () => {
   try {
     isLoading.value = true;
