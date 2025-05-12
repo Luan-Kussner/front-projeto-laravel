@@ -79,12 +79,9 @@ import BaseForm from "@/components/BaseForm/Main.vue";
 import api from "@/services/Api";
 import { useRoute, useRouter } from "vue-router";
 import {
-  getExtnsionFile,
   convertCurrencyToFloat,
   formatMoneyPtBr,
 } from "@/services/Helper";
-import toast from "@/services/Toast";
-import { VMoney } from "v-money";
 import Swal from "sweetalert2";
 
 const route = useRoute();
@@ -223,48 +220,39 @@ const updateProduct = async () => {
 const getProductById = async () => {
   try {
     isLoading.value = true;
-    const { data } = await api.get(`/product/${idUpdate.value}`);
+    const { data } = await api.get(`/produtos/${idUpdate.value}`);
 
     if (data) {
-      descricao.value = data.descricao;
+      nome.value     = data.nome;
       preco.value = formatMoneyPtBr(data.preco);
-
-      if (data.pathImage != null) {
-        let fileName = data.pathImage.split("/");
-        fileName = fileName[fileName.length - 1];
-
-        const result = await api.get(data.pathImage);
-        const ext = getExtnsionFile(result.headers["content-type"]);
-        const mimeType = result.headers["content-type"];
-
-        const file = await urlToFile(data.pathImage, fileName + ext, mimeType);
-        objectkey.value = [file];
-      }
+      estoque.value = data.estoque;
+      descricao.value   = data.descricao;
+      previewImage.value = data.objectkey || null; 
     }
   } catch (err) {
     if (err?.response && err?.response?.data) {
+      let errors = "";
       err.response.data.errors.map((error) => {
-        return toast.error(error, {
-                autoClose: 3500,
-              });
+        errors += error.message + "<br />";
+      });
+
+      return Swal.fire({
+        icon: "error",
+        html: errors,
+        showConfirmButton: false,
+        timer: err.response.data.errors.length > 1 ? 3000 : 2500,
       });
     }
 
-    return toast.error("Algo deu errado. Tente novamente.", {
-      autoClose: 3500,
+    Swal.fire({
+      icon: "error",
+      text: "Algo deu errado. Tente novamente",
+      showConfirmButton: false,
+      timer: 2500,
     });
   } finally {
     isLoading.value = false;
   }
-};
-
-const urlToFile = async (url, filename, mimeType) => {
-  // Buscar a imagem
-  const response = await fetch(url);
-  // Converter a resposta em um Blob
-  const blob = await response.blob();
-  // Criar um arquivo a partir do Blob
-  return new File([blob], filename, { type: mimeType });
 };
 
 const handleImageUpload = (event) => {
