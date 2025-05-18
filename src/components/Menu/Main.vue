@@ -44,6 +44,14 @@
             ><i class="bi bi-box-seam"></i> Produtos</router-link
           >
         </li>
+        <li class="pt-5">
+          <router-link
+            to="/orders"
+            exactActiveClass="text-emerald-400 font-bold"
+            class="pl-5 hover:opacity-50 transition ease duration-300"
+            ><i class="bi bi-list-ol"></i> Pedidos</router-link
+          >
+        </li>
         <li class="pt-5 border-b border-slate-700"></li>
         <li class="pt-5" v-show="token">
           <router-link

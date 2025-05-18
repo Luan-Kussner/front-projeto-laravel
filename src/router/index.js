@@ -86,6 +86,31 @@ const routes = [
           },
         ],
       },
+            {
+        path: "/orders",
+        name: "orders",
+        component: () =>
+          import(/* webpackChunkName: "order" */ "@/views/Orders/Main.vue"),
+        children: [
+          {
+            path: "",
+            name: "homeOrders",
+            component: () =>
+              import(
+                /* webpackChunkName: "order" */ "@/views/Orders/Home/Main.vue"
+              ),
+          },
+          {
+            path: "adicionar/:id",
+            name: "formOrders",
+            meta: { auth: true },
+            component: () =>
+              import(
+                /* webpackChunkName: "order" */ "@/views/Orders/Form/Main.vue"
+              ),
+          },
+        ],
+      },
       {
         path: "/perfil",
         name: "profile",
